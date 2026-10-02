@@ -34,13 +34,25 @@ export const CustomButton: React.FC<CustomButtonProps> = ({
     return title
   }
 
+  const variantStyles = {
+    primary: styles.primary,
+    secondary: styles.secondary,
+    outline: styles.outline,
+  }
+
+  const variantTextStyles = {
+    primary: styles.primaryText,
+    secondary: styles.secondaryText,
+    outline: styles.outlineText,
+  }
+
   return (
     <TouchableOpacity
       activeOpacity={0.8}
       disabled={isDisabled}
       style={[
         styles.baseButton,
-        styles[variant],
+        variantStyles[variant],
         isDisabled && styles.disabledButton,
         style,
       ]}
@@ -55,7 +67,7 @@ export const CustomButton: React.FC<CustomButtonProps> = ({
         <Text
           style={[
             styles.baseText,
-            styles[`${variant}Text`],
+            variantTextStyles[variant],
             isDisabled && styles.disabledText,
           ]}
         >

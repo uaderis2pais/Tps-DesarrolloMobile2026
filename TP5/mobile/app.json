@@ -1,15 +1,12 @@
 {
+  "$schema": "https://json.schemastore.org/expo.json",
   "expo": {
     "name": "Network QoS Monitor",
     "slug": "network-qos-monitor",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "scheme": "networkqos",
-    "splash": {
-      "backgroundColor": "#0F172A"
-    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.networkqos.monitor",

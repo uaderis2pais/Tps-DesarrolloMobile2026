@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/expo.json",
   "expo": {
     "name": "TP2 - Checkout Tienda",
     "slug": "tp2",

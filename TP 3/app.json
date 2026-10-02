@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/expo.json",
   "expo": {
     "name": "iBank - Banking App",
     "slug": "ibank-tp3",
@@ -6,7 +7,6 @@
     "orientation": "portrait",
     "scheme": "ibanktp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ibank.tp3"

@@ -1,0 +1,10 @@
+{
+  "json.schemas": [
+    {
+      "fileMatch": ["**/app.json"],
+      "url": "https://json.schemastore.org/expo.json"
+    }
+  ],
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.tabSize": 2
+}

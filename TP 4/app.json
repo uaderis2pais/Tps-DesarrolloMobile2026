@@ -1,18 +1,12 @@
 {
+  "$schema": "https://json.schemastore.org/expo.json",
   "expo": {
     "name": "AgroPulse",
     "slug": "agropulse-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "scheme": "agropulse",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#1B4D3E"
-    },
     "ios": {
       "supportsTablet": false,
       "infoPlist": {
@@ -21,7 +15,6 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#1B4D3E"
       },
       "permissions": [
@@ -31,8 +24,7 @@
     },
     "web": {
       "bundler": "metro",
-      "output": "single",
-      "favicon": "./assets/favicon.png"
+      "output": "single"
     },
     "plugins": [
       "expo-router",
