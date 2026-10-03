@@ -37,7 +37,7 @@ export const DEFAULT_THRESHOLDS: QoSThresholds = {
 };
 
 export const DEFAULT_CONFIG: AppConfig = {
-  backendUrl: 'http://localhost:3001',
+  backendUrl: 'https://speed.cloudflare.com',
   hosts: DEFAULT_HOSTS,
   thresholds: DEFAULT_THRESHOLDS,
   backgroundIntervalMinutes: 15,

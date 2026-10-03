@@ -50,12 +50,20 @@ export default function CoverageMapScreen() {
         })}
       </View>
 
+      {/* Indicador de Ciudad y Coordenadas */}
+      <View style={styles.cityBanner}>
+        <MaterialCommunityIcons name="map-marker-radius" size={15} color={colors.secondary} />
+        <Text style={styles.cityBannerText}>
+          Concepción del Uruguay, Entre Ríos • Coordenadas GPS Reales
+        </Text>
+      </View>
+
       {/* Componente de Mapa de Cobertura y Heatmap */}
       <CoverageHeatmap
         sessions={filtered}
         currentLatitude={store.currentLocation.latitude}
         currentLongitude={store.currentLocation.longitude}
-        height={380}
+        height={440}
       />
 
       {/* Tarjeta de Resumen Geográfico */}
@@ -199,5 +207,22 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: 14,
     fontWeight: '800',
+  },
+  cityBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: colors.surfaceLight,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 8,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: spacing.md,
+  },
+  cityBannerText: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    fontWeight: '700',
   },
 });

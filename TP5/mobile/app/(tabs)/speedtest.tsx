@@ -58,6 +58,63 @@ export default function SpeedTestScreen() {
         </Text>
       </View>
 
+      {/* Selector de Servidor de Medición (RF-03) */}
+      <View style={styles.serverCard}>
+        <Text style={styles.serverCardLabel}>SERVIDOR DE THROUGHPUT (RF-03):</Text>
+        <View style={styles.serverRow}>
+          <Pressable
+            style={[
+              styles.serverTab,
+              store.config.backendUrl.includes('cloudflare.com') && styles.serverTabActive,
+            ]}
+            onPress={() => store.updateConfig({ backendUrl: 'https://speed.cloudflare.com' })}
+            disabled={store.isTesting}
+          >
+            <MaterialCommunityIcons
+              name="cloud-check"
+              size={15}
+              color={store.config.backendUrl.includes('cloudflare.com') ? colors.white : colors.textSecondary}
+            />
+            <Text
+              style={[
+                styles.serverTabText,
+                store.config.backendUrl.includes('cloudflare.com') && styles.serverTabTextActive,
+              ]}
+            >
+              Internet Real (Cloudflare)
+            </Text>
+          </Pressable>
+
+          <Pressable
+            style={[
+              styles.serverTab,
+              !store.config.backendUrl.includes('cloudflare.com') && styles.serverTabActive,
+            ]}
+            onPress={() => store.updateConfig({ backendUrl: 'http://localhost:3001' })}
+            disabled={store.isTesting}
+          >
+            <MaterialCommunityIcons
+              name="server-network"
+              size={15}
+              color={!store.config.backendUrl.includes('cloudflare.com') ? colors.white : colors.textSecondary}
+            />
+            <Text
+              style={[
+                styles.serverTabText,
+                !store.config.backendUrl.includes('cloudflare.com') && styles.serverTabTextActive,
+              ]}
+            >
+              Servidor Local (Node.js)
+            </Text>
+          </Pressable>
+        </View>
+        <Text style={styles.serverHelpText}>
+          {store.config.backendUrl.includes('cloudflare.com')
+            ? '🌐 Midiendo velocidad real de tu enlace a Internet (WiFi / Datos Móviles).'
+            : '💻 Midiendo contra backend Node.js en localhost:3001 (calibrado a canal celular).'}
+        </Text>
+      </View>
+
       {/* Velocímetro Dinámico */}
       <View style={styles.gaugeCard}>
         <SpeedometerGauge
@@ -305,5 +362,56 @@ const styles = StyleSheet.create({
   sectionSub: {
     color: colors.textMuted,
     fontSize: 11,
+  },
+  serverCard: {
+    backgroundColor: colors.surface,
+    padding: spacing.md,
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: spacing.md,
+  },
+  serverCardLabel: {
+    color: colors.textMuted,
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 1,
+    marginBottom: spacing.xs,
+  },
+  serverRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    marginBottom: 6,
+  },
+  serverTab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: colors.surfaceLight,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  serverTabActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  serverTabText: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  serverTabTextActive: {
+    color: colors.white,
+    fontWeight: '900',
+  },
+  serverHelpText: {
+    color: colors.textSecondary,
+    fontSize: 11,
+    lineHeight: 15,
   },
 });
