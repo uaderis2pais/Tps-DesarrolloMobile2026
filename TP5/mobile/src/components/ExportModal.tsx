@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   Modal,
-  TouchableOpacity,
+  Pressable,
   ActivityIndicator,
 } from 'react-native';
 import { MeasurementSession } from '../types';
@@ -58,9 +58,9 @@ export const ExportModal: React.FC<Props> = ({ visible, sessions, onClose }) => 
               <MaterialCommunityIcons name="cloud-download" size={22} color={colors.secondary} />
               <Text style={styles.title}>Exportar Historial</Text>
             </View>
-            <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
+            <Pressable onPress={onClose} style={styles.closeBtn}>
               <MaterialCommunityIcons name="close" size={20} color={colors.textSecondary} />
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           <Text style={styles.summaryText}>
@@ -72,7 +72,7 @@ export const ExportModal: React.FC<Props> = ({ visible, sessions, onClose }) => 
           {/* Selector de Formato CSV / JSON */}
           <Text style={styles.label}>Formato de archivo:</Text>
           <View style={styles.formatRow}>
-            <TouchableOpacity
+            <Pressable
               style={[styles.formatBtn, format === 'csv' && styles.formatBtnActive]}
               onPress={() => setFormat('csv')}
             >
@@ -85,9 +85,9 @@ export const ExportModal: React.FC<Props> = ({ visible, sessions, onClose }) => 
                 CSV (Excel)
               </Text>
               <Text style={styles.formatSub}>Tablas y hojas de cálculo</Text>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity
+            <Pressable
               style={[styles.formatBtn, format === 'json' && styles.formatBtnActive]}
               onPress={() => setFormat('json')}
             >
@@ -100,11 +100,11 @@ export const ExportModal: React.FC<Props> = ({ visible, sessions, onClose }) => 
                 JSON Completo
               </Text>
               <Text style={styles.formatSub}>Estructura nativa para APIs</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           {/* Botón de Descarga / Exportación */}
-          <TouchableOpacity
+          <Pressable
             style={styles.exportBtn}
             onPress={handleExport}
             disabled={isExporting}
@@ -119,7 +119,7 @@ export const ExportModal: React.FC<Props> = ({ visible, sessions, onClose }) => 
                 </Text>
               </>
             )}
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
     </Modal>

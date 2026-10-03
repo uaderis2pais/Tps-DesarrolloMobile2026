@@ -37,3 +37,6 @@ Thumbs.db
 
 # typescript
 *.tsbuildinfo
+
+# informe
+informe/

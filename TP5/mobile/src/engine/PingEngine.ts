@@ -7,7 +7,7 @@ export class PingEngine {
    */
   static async runPingTestSuite(
     hosts: HostProbeTarget[],
-    samplesPerHost: number = 5,
+    samplesPerHost: number = 3,
     onHostProgress?: (result: PingResult) => void
   ): Promise<PingResult[]> {
     const results: PingResult[] = [];
@@ -25,7 +25,7 @@ export class PingEngine {
    */
   static async pingSingleHost(
     target: HostProbeTarget,
-    samplesCount: number = 5,
+    samplesCount: number = 3,
     onProgress?: (result: PingResult) => void
   ): Promise<PingResult> {
     const samples: number[] = [];
@@ -45,8 +45,8 @@ export class PingEngine {
         onProgress(intermediate);
       }
 
-      // Pequeño intervalo inter-paquete (50ms)
-      await new Promise((r) => setTimeout(r, 60));
+      // Pequeño intervalo inter-paquete (30ms)
+      await new Promise((r) => setTimeout(r, 30));
     }
 
     const finalResult = this.computeStatistics(
@@ -72,11 +72,11 @@ export class PingEngine {
     const probeUrl = this.resolveProbeUrl(target);
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 2500);
+    const timeout = setTimeout(() => controller.abort(), 1200);
 
     try {
       const response = await fetch(probeUrl, {
-        method: 'HEAD',
+        method: 'GET',
         cache: 'no-store',
         mode: 'cors',
         signal: controller.signal,
@@ -85,19 +85,17 @@ export class PingEngine {
       clearTimeout(timeout);
       const elapsed = performance.now() - start;
 
-      // Si responde OK o un código HTTP estándar, la sonda completó el Round-Trip
+      // Si responde OK o estado estándar
       if (response.status || response.type === 'opaque') {
         return Math.max(1, Math.round(elapsed));
       }
       return Math.max(1, Math.round(elapsed));
     } catch (err: any) {
       clearTimeout(timeout);
-      
-      // En Web/React Native, errores CORS o fetch 'opaque' a IPs públicas (como 1.1.1.1 o 8.8.8.8)
-      // completan el socket TCP SYN/ACK handshake antes de rechazar la capa HTTP.
-      // Medimos el tiempo real de apertura del socket.
       const elapsed = performance.now() - start;
-      if (elapsed < 2000 && err?.name !== 'AbortError') {
+
+      // En Web/CORS opaco o TCP Handshake completado
+      if (elapsed < 1100 && err?.name !== 'AbortError') {
         return Math.max(2, Math.round(elapsed));
       }
       throw err;
@@ -163,15 +161,7 @@ export class PingEngine {
   }
 
   private static resolveProbeUrl(target: HostProbeTarget): string {
-    if (target.host.startsWith('http://') || target.host.startsWith('https://')) {
-      const sep = target.host.includes('?') ? '&' : '?';
-      return `${target.host}${sep}_ts=${Date.now()}`;
-    }
-    
-    // Si es IP pura (e.g. 1.1.1.1 o 8.8.8.8)
-    if (target.port === 80) {
-      return `https://${target.host}/generate_204?_ts=${Date.now()}`;
-    }
-    return `https://${target.host}/?_ts=${Date.now()}`;
+    const sep = target.host.includes('?') ? '&' : '?';
+    return `${target.host}${sep}_ts=${Date.now()}`;
   }
 }

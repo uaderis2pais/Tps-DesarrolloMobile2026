@@ -3,7 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
   Dimensions,
   Modal,
 } from 'react-native';
@@ -30,7 +30,6 @@ export const CoverageHeatmap: React.FC<Props> = ({
   const mapWidth = Math.max(320, screenWidth - 32);
   const [showHeatmap, setShowHeatmap] = useState(true);
   const [selectedSession, setSelectedSession] = useState<MeasurementSession | null>(null);
-  const [zoomLevel, setZoomLevel] = useState(1);
 
   // Calcular límites geográficos (Bounding Box)
   const lats = sessions.map((s) => s.location.latitude).concat(currentLatitude);
@@ -46,9 +45,7 @@ export const CoverageHeatmap: React.FC<Props> = ({
     const latSpan = maxLat - minLat || 0.01;
     const lngSpan = maxLng - minLng || 0.01;
 
-    // Normalizado de 0 a 1
     const normX = (lng - minLng) / lngSpan;
-    // En pantalla, Y crece hacia abajo, mientras que latitud crece hacia el norte
     const normY = 1 - (lat - minLat) / latSpan;
 
     const padding = 24;
@@ -73,7 +70,7 @@ export const CoverageHeatmap: React.FC<Props> = ({
         </View>
 
         <View style={styles.actionsRow}>
-          <TouchableOpacity
+          <Pressable
             style={[styles.toolBtn, showHeatmap && styles.toolBtnActive]}
             onPress={() => setShowHeatmap(!showHeatmap)}
           >
@@ -85,7 +82,7 @@ export const CoverageHeatmap: React.FC<Props> = ({
             <Text style={[styles.toolBtnText, showHeatmap && styles.toolBtnTextActive]}>
               Heatmap
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
 
@@ -120,7 +117,7 @@ export const CoverageHeatmap: React.FC<Props> = ({
             </RadialGradient>
           </Defs>
 
-          {/* Fondo estilo mapa oscuro satelital / técnico */}
+          {/* Fondo estilo mapa oscuro satelital */}
           <Rect width={mapWidth} height={height} fill="#0d1424" rx={16} />
 
           {/* Retícula de cuadrícula geográfica */}
@@ -163,22 +160,19 @@ export const CoverageHeatmap: React.FC<Props> = ({
                   key={`heat-${s.id}`}
                   cx={x}
                   cy={y}
-                  r={38 * zoomLevel}
+                  r={38}
                   fill={gradId}
                 />
               );
             })}
 
-          {/* 2. Marcadores interactivos de estación */}
+          {/* 2. Marcadores visuales de estación (sin props de responder para compatibilidad con React 19) */}
           {sessions.map((s) => {
             const { x, y } = projectCoords(s.location.latitude, s.location.longitude);
             const markerColor = QoSScorer.getQoSColor(s.overallQoSRating);
 
             return (
-              <G
-                key={`marker-${s.id}`}
-                onPress={() => setSelectedSession(s)}
-              >
+              <G key={`marker-graphics-${s.id}`}>
                 <Circle
                   cx={x}
                   cy={y}
@@ -225,6 +219,24 @@ export const CoverageHeatmap: React.FC<Props> = ({
           />
         </Svg>
 
+        {/* Hotspots interactivos independientes (evita responder props en elementos SVG <G>) */}
+        {sessions.map((s) => {
+          const { x, y } = projectCoords(s.location.latitude, s.location.longitude);
+          return (
+            <Pressable
+              key={`hotspot-${s.id}`}
+              style={[
+                styles.pinHotspot,
+                {
+                  left: x - 18,
+                  top: y - 18,
+                },
+              ]}
+              onPress={() => setSelectedSession(s)}
+            />
+          );
+        })}
+
         {/* Leyenda de Semáforo de Cobertura */}
         <View style={styles.legendOverlay}>
           <View style={styles.legendItem}>
@@ -263,9 +275,9 @@ export const CoverageHeatmap: React.FC<Props> = ({
                     {new Date(selectedSession.timestamp).toLocaleString()}
                   </Text>
                 </View>
-                <TouchableOpacity onPress={() => setSelectedSession(null)} style={styles.closeBtn}>
+                <Pressable onPress={() => setSelectedSession(null)} style={styles.closeBtn}>
                   <MaterialCommunityIcons name="close" size={20} color={colors.textSecondary} />
-                </TouchableOpacity>
+                </Pressable>
               </View>
 
               <View style={styles.modalBody}>
@@ -406,6 +418,13 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     position: 'relative',
     alignSelf: 'center',
+  },
+  pinHotspot: {
+    position: 'absolute',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    zIndex: 10,
   },
   legendOverlay: {
     position: 'absolute',

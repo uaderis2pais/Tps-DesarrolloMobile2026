@@ -89,3 +89,60 @@ BEGIN
     );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 2. Función RPC para que el Worker aplique comandos asíncronos en 1-4s (RF-15)
+CREATE OR REPLACE FUNCTION apply_irrigation_command(
+    p_command_id UUID,
+    p_status TEXT,
+    p_error_reason TEXT DEFAULT NULL
+)
+RETURNS JSONB AS $$
+DECLARE
+    v_valve_id UUID;
+    v_action TEXT;
+    v_new_valve_status TEXT;
+BEGIN
+    SELECT valve_id, action INTO v_valve_id, v_action
+    FROM irrigation_commands
+    WHERE id = p_command_id;
+
+    IF v_valve_id IS NULL THEN
+        RAISE EXCEPTION 'Comando no encontrado';
+    END IF;
+
+    IF p_status = 'applied' THEN
+        v_new_valve_status := CASE WHEN v_action = 'close' THEN 'closed' ELSE 'open' END;
+        
+        UPDATE valves
+        SET status = v_new_valve_status, updated_at = NOW()
+        WHERE id = v_valve_id;
+
+        UPDATE irrigation_commands
+        SET status = 'applied', applied_at = NOW()
+        WHERE id = p_command_id;
+    ELSIF p_status = 'failed' THEN
+        UPDATE irrigation_commands
+        SET status = 'failed', error_reason = p_error_reason, applied_at = NOW()
+        WHERE id = p_command_id;
+    END IF;
+
+    RETURN jsonb_build_object('success', true);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 3. Función RPC para que el Simulador IoT registre telemetría continua (RF-08, RF-24)
+CREATE OR REPLACE FUNCTION record_telemetry_reading(
+    p_station_id UUID,
+    p_moisture_pct NUMERIC,
+    p_temp_c NUMERIC,
+    p_rain_mm NUMERIC DEFAULT 0.0
+)
+RETURNS JSONB AS $$
+BEGIN
+    INSERT INTO readings (station_id, moisture_pct, temp_c, rain_mm, source, measured_at)
+    VALUES (p_station_id, p_moisture_pct, p_temp_c, p_rain_mm, 'sensor', NOW());
+
+    RETURN jsonb_build_object('success', true);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+

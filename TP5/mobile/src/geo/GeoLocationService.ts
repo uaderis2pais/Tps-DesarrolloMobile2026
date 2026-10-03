@@ -11,19 +11,28 @@ export class GeoLocationService {
   };
 
   /**
-   * Obtiene la posición GPS con alta precisión (RF-04)
+   * Obtiene la posición GPS con alta precisión y timeout de seguridad (RF-04)
    */
   static async getCurrentLocation(): Promise<GeoLocation> {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        console.warn('[GeoLocationService] Permiso de ubicación denegado, utilizando coordenadas de referencia');
-        return this.cachedLocation;
+        return this.getFallbackLocation();
       }
 
-      const position = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High,
+      const positionPromise = Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
       });
+
+      const timeoutPromise = new Promise<null>((resolve) =>
+        setTimeout(() => resolve(null), 1800)
+      );
+
+      const position = await Promise.race([positionPromise, timeoutPromise]);
+
+      if (!position) {
+        return this.getFallbackLocation();
+      }
 
       let addressSummary = 'Ubicación GPS';
       try {
@@ -50,20 +59,22 @@ export class GeoLocationService {
       this.cachedLocation = location;
       return location;
     } catch (err) {
-      console.warn('[GeoLocationService] Error obteniendo GPS, usando fallback:', err);
-      // Agregar leve jitter para permitir dispersión de puntos en demostración
-      const deltaLat = (Math.random() - 0.5) * 0.005;
-      const deltaLng = (Math.random() - 0.5) * 0.005;
-
-      return {
-        ...this.cachedLocation,
-        latitude: this.cachedLocation.latitude + deltaLat,
-        longitude: this.cachedLocation.longitude + deltaLng,
-      };
+      return this.getFallbackLocation();
     }
   }
 
   static getCachedLocation(): GeoLocation {
     return this.cachedLocation;
+  }
+
+  private static getFallbackLocation(): GeoLocation {
+    const deltaLat = (Math.random() - 0.5) * 0.004;
+    const deltaLng = (Math.random() - 0.5) * 0.004;
+
+    return {
+      ...this.cachedLocation,
+      latitude: Number((this.cachedLocation.latitude + deltaLat).toFixed(5)),
+      longitude: Number((this.cachedLocation.longitude + deltaLng).toFixed(5)),
+    };
   }
 }

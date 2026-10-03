@@ -3,20 +3,25 @@
 // Consume eventos de Redpanda, persiste en Supabase y ejecuta comandos de riego
 // ==============================================================================
 
-import { Kafka } from 'kafkajs';
+import { Kafka, logLevel } from 'kafkajs';
 import { createClient } from '@supabase/supabase-js';
 
 const KAFKA_BROKERS = (process.env.KAFKA_BROKERS || 'localhost:9092').split(',');
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://iwjkpmmwjvnthgiepzyt.supabase.co';
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://yltezwfpnrwlzgxvdpqn.supabase.co';
+const SUPABASE_KEY =
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ||
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlsdGV6d2ZwbnJ3bHpneHZkcHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxNzQ2OTYsImV4cCI6MjEwNTc1MDY5Nn0.evEkI-5Vw4qli9XgCcDXr8TT7nxsDZ02ph1YKj6lIIo';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const kafka = new Kafka({
   clientId: 'agropulse-worker-consumer',
   brokers: KAFKA_BROKERS,
+  connectionTimeout: 1000,
+  logLevel: logLevel.NOTHING,
   retry: {
-    retries: 3,
+    retries: 0,
   },
 });
 
@@ -28,6 +33,21 @@ async function startWorker() {
   console.log('================================================================');
   console.log(`Brokers: ${KAFKA_BROKERS.join(', ')}`);
   console.log(`Supabase URL: ${SUPABASE_URL}`);
+
+  // Autenticar en Supabase para obtener permisos RLS de lectura y escritura
+  try {
+    const { data: authData, error: authErr } = await supabase.auth.signInWithPassword({
+      email: process.env.WORKER_EMAIL || 'productor@agropulse.test',
+      password: process.env.WORKER_PASSWORD || 'AgroPulse2026!',
+    });
+    if (!authErr && authData.session) {
+      console.log(`🔐 [Worker Auth] Sesión autenticada como ${authData.user.email} (Permisos RLS concedidos)`);
+    } else {
+      console.warn(`⚠️ [Worker Auth] Error autenticando: ${authErr?.message}`);
+    }
+  } catch (authEx: any) {
+    console.warn(`⚠️ [Worker Auth] Excepción en login: ${authEx.message}`);
+  }
 
   let kafkaAvailable = false;
 
@@ -78,7 +98,12 @@ async function startWorker() {
   // ----------------------------------------------------------------------------
   console.log('⚡ Iniciando listener de comandos de irrigación (polling 1.5s)...');
 
+  let isProcessing = false;
+
   setInterval(async () => {
+    if (isProcessing) return;
+    isProcessing = true;
+
     try {
       const { data: pendingCommands, error } = await supabase
         .from('irrigation_commands')
@@ -98,49 +123,57 @@ async function startWorker() {
         const delayMs = 1000 + Math.floor(Math.random() * 3000);
         await new Promise((resolve) => setTimeout(resolve, delayMs));
 
-        // 10% de fallos aleatorios académicos para demostrar el camino de error (§08 punto 7)
-        const simulateFailure = Math.random() < 0.1;
+        // Simulación de fallos académicos solo si se activa explícitamente (§08 punto 7)
+        const simulateFailure = process.env.SIMULATE_FAILURE === 'true';
 
         if (simulateFailure) {
-          await supabase
-            .from('irrigation_commands')
-            .update({
-              status: 'failed',
-              error_reason: 'valve_timeout',
-              applied_at: new Date().toISOString(),
-            })
-            .eq('id', cmd.id);
+          const { error: rpcErr } = await supabase.rpc('apply_irrigation_command', {
+            p_command_id: cmd.id,
+            p_status: 'failed',
+            p_error_reason: 'valve_timeout',
+          });
+
+          if (rpcErr) {
+            await supabase
+              .from('irrigation_commands')
+              .update({
+                status: 'failed',
+                error_reason: 'valve_timeout',
+                applied_at: new Date().toISOString(),
+              })
+              .eq('id', cmd.id);
+          }
 
           console.log(`❌ [command failed] Comando ${cmd.id} marcado como 'failed' por valve_timeout`);
         } else {
-          // Determinar nuevo estado de la válvula según la acción
-          const newStatus = cmd.action === 'close' ? 'closed' : 'open';
+          // Aplicar comando mediante RPC atómico
+          const { error: rpcErr } = await supabase.rpc('apply_irrigation_command', {
+            p_command_id: cmd.id,
+            p_status: 'applied',
+          });
 
-          // 1. Actualizar estado de la válvula
-          await supabase
-            .from('valves')
-            .update({
-              status: newStatus,
-              updated_at: new Date().toISOString(),
-            })
-            .eq('id', cmd.valve_id);
+          if (rpcErr) {
+            const newStatus = cmd.action === 'close' ? 'closed' : 'open';
+            await supabase
+              .from('valves')
+              .update({ status: newStatus, updated_at: new Date().toISOString() })
+              .eq('id', cmd.valve_id);
 
-          // 2. Marcar comando como aplicado (RF-15)
-          await supabase
-            .from('irrigation_commands')
-            .update({
-              status: 'applied',
-              applied_at: new Date().toISOString(),
-            })
-            .eq('id', cmd.id);
+            await supabase
+              .from('irrigation_commands')
+              .update({ status: 'applied', applied_at: new Date().toISOString() })
+              .eq('id', cmd.id);
+          }
 
           console.log(
-            `✅ [command applied] Comando ${cmd.id} APLICADO con éxito. Válvula ${cmd.valve_id} -> ${newStatus.toUpperCase()} (RF-15)`
+            `✅ [command applied] Comando ${cmd.id} APLICADO con éxito (RF-15)`
           );
         }
       }
     } catch (cmdLoopErr: any) {
       console.error('[Worker Command Loop Error]:', cmdLoopErr.message);
+    } finally {
+      isProcessing = false;
     }
   }, 1500);
 }

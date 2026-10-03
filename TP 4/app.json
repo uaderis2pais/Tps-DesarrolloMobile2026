@@ -1,5 +1,4 @@
 {
-  "$schema": "https://json.schemastore.org/expo.json",
   "expo": {
     "name": "AgroPulse",
     "slug": "agropulse-mobile",

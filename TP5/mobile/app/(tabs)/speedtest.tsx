@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
+  Pressable,
   ActivityIndicator,
 } from 'react-native';
 import { useQoSStore } from '../../src/store/useQoSStore';
@@ -104,7 +104,7 @@ export default function SpeedTestScreen() {
       </View>
 
       {/* Botón de Ejecución */}
-      <TouchableOpacity
+      <Pressable
         style={[styles.actionBtn, store.isTesting && styles.actionBtnTesting]}
         onPress={handleRun}
         disabled={store.isTesting}
@@ -119,7 +119,7 @@ export default function SpeedTestScreen() {
             {store.lastSession ? 'REPETIR PRUEBA COMPLETA' : 'INICIAR PRUEBA QoS'}
           </Text>
         )}
-      </TouchableOpacity>
+      </Pressable>
 
       {/* Evaluación QoS del resultado */}
       {store.lastSession && !store.isTesting && (

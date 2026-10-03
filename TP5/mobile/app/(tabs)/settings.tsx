@@ -5,7 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   Switch,
-  TouchableOpacity,
+  Pressable,
   TextInput,
   Alert,
 } from 'react-native';
@@ -109,7 +109,7 @@ export default function SettingsScreen() {
           {[5, 15, 30, 60].map((mins) => {
             const isSelected = store.config.backgroundIntervalMinutes === mins;
             return (
-              <TouchableOpacity
+              <Pressable
                 key={mins}
                 style={[styles.intervalChip, isSelected && styles.intervalChipActive]}
                 onPress={() => store.updateConfig({ backgroundIntervalMinutes: mins })}
@@ -119,7 +119,7 @@ export default function SettingsScreen() {
                 >
                   {mins} min
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             );
           })}
         </View>
@@ -157,9 +157,9 @@ export default function SettingsScreen() {
             placeholderTextColor={colors.textMuted}
             autoCapitalize="none"
           />
-          <TouchableOpacity style={styles.testBtn} onPress={handleTestConnection}>
+          <Pressable style={styles.testBtn} onPress={handleTestConnection}>
             <Text style={styles.testBtnText}>Probar</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
 
@@ -220,9 +220,9 @@ export default function SettingsScreen() {
           />
         </View>
 
-        <TouchableOpacity style={styles.saveBtn} onPress={handleSaveThresholds}>
+        <Pressable style={styles.saveBtn} onPress={handleSaveThresholds}>
           <Text style={styles.saveBtnText}>Guardar Parámetros</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {/* 4. Hosts de Sondeo Configurados (RF-02) */}
@@ -252,7 +252,7 @@ export default function SettingsScreen() {
         <Text style={styles.settingDesc}>
           Restaurar la base de datos a los registros de muestra originales
         </Text>
-        <TouchableOpacity
+        <Pressable
           style={styles.resetBtn}
           onPress={() => {
             Alert.alert(
@@ -270,7 +270,7 @@ export default function SettingsScreen() {
           }}
         >
           <Text style={styles.resetBtnText}>Restaurar Datos de Muestra</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </ScrollView>
   );

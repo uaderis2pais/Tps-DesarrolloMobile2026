@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   Modal,
-  TouchableOpacity,
+  Pressable,
   TextInput,
   ScrollView,
 } from 'react-native';
@@ -71,9 +71,9 @@ export const FilterModal: React.FC<Props> = ({
               <MaterialCommunityIcons name="filter-variant" size={20} color={colors.primary} />
               <Text style={styles.title}>Filtros Avanzados</Text>
             </View>
-            <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
+            <Pressable onPress={onClose} style={styles.closeBtn}>
               <MaterialCommunityIcons name="close" size={20} color={colors.textSecondary} />
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           <ScrollView style={styles.content}>
@@ -89,9 +89,9 @@ export const FilterModal: React.FC<Props> = ({
                 onChangeText={setSearchQuery}
               />
               {searchQuery.length > 0 && (
-                <TouchableOpacity onPress={() => setSearchQuery('')}>
+                <Pressable onPress={() => setSearchQuery('')}>
                   <MaterialCommunityIcons name="close-circle" size={16} color={colors.textMuted} />
-                </TouchableOpacity>
+                </Pressable>
               )}
             </View>
 
@@ -101,7 +101,7 @@ export const FilterModal: React.FC<Props> = ({
               {availableTypes.map((type) => {
                 const isSelected = selectedTypes.includes(type);
                 return (
-                  <TouchableOpacity
+                  <Pressable
                     key={type}
                     style={[styles.chip, isSelected && styles.chipActive]}
                     onPress={() => toggleType(type)}
@@ -109,7 +109,7 @@ export const FilterModal: React.FC<Props> = ({
                     <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>
                       {type}
                     </Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 );
               })}
             </View>
@@ -128,7 +128,7 @@ export const FilterModal: React.FC<Props> = ({
                     : 'Últimos 30 días';
                 const isSelected = dateRange === r;
                 return (
-                  <TouchableOpacity
+                  <Pressable
                     key={r}
                     style={[styles.chip, isSelected && styles.chipActive]}
                     onPress={() => setDateRange(r)}
@@ -136,7 +136,7 @@ export const FilterModal: React.FC<Props> = ({
                     <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>
                       {label}
                     </Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 );
               })}
             </View>
@@ -147,7 +147,7 @@ export const FilterModal: React.FC<Props> = ({
               {(['EXCELLENT', 'GOOD', 'FAIR', 'POOR'] as const).map((q) => {
                 const isSelected = minQoS === q;
                 return (
-                  <TouchableOpacity
+                  <Pressable
                     key={q}
                     style={[styles.chip, isSelected && styles.chipActive]}
                     onPress={() => setMinQoS(isSelected ? undefined : q)}
@@ -155,7 +155,7 @@ export const FilterModal: React.FC<Props> = ({
                     <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>
                       {q}
                     </Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 );
               })}
             </View>
@@ -163,13 +163,13 @@ export const FilterModal: React.FC<Props> = ({
 
           {/* Acciones de pie */}
           <View style={styles.footer}>
-            <TouchableOpacity style={styles.resetBtn} onPress={handleReset}>
+            <Pressable style={styles.resetBtn} onPress={handleReset}>
               <Text style={styles.resetBtnText}>Limpiar</Text>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity style={styles.applyBtn} onPress={handleApply}>
+            <Pressable style={styles.applyBtn} onPress={handleApply}>
               <Text style={styles.applyBtnText}>Aplicar Filtros</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
       </View>

@@ -252,6 +252,34 @@ export const PlotPolygonMap: React.FC<PlotPolygonMapProps> = ({
         </View>
       </View>
 
+      {/* Selector Rápido de Lotes en Chips */}
+      <View style={styles.plotChipsContainer}>
+        {plots.map((plot) => {
+          const isSelected = selectedPlot?.id === plot.id;
+          const meta = getSemaforoMeta(plot.status || 'stale');
+          return (
+            <TouchableOpacity
+              key={plot.id}
+              style={[styles.plotChip, isSelected && styles.plotChipSelected]}
+              onPress={() => {
+                setSelectedPlot(plot);
+                if (onSelectPlot) onSelectPlot(plot);
+              }}
+            >
+              <View style={[styles.plotChipDot, { backgroundColor: meta.color }]} />
+              <Text
+                style={[
+                  styles.plotChipText,
+                  isSelected && styles.plotChipTextSelected,
+                ]}
+              >
+                {plot.name}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+
       {/* Tarjeta inferior del lote seleccionado (Tap en polígono abre detalle) */}
       {selectedPlot && (
         <View style={styles.plotCard}>
@@ -445,5 +473,40 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '600',
     fontSize: 14,
+  },
+  plotChipsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 10,
+  },
+  plotChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  plotChipSelected: {
+    backgroundColor: '#E8F5E9',
+    borderColor: '#1B4D3E',
+  },
+  plotChipDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 6,
+  },
+  plotChipText: {
+    fontSize: 12,
+    color: '#444',
+    fontWeight: '500',
+  },
+  plotChipTextSelected: {
+    color: '#1B4D3E',
+    fontWeight: '700',
   },
 });

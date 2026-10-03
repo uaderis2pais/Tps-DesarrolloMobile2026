@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
+  Pressable,
 } from 'react-native';
 import { useQoSStore } from '../../src/store/useQoSStore';
 import { colors, spacing, borderRadius } from '../../src/constants/theme';
@@ -37,7 +37,7 @@ export default function CoverageMapScreen() {
         {(['ALL', '5G', '4G', '3G', 'WIFI'] as const).map((t) => {
           const isSelected = selectedType === t;
           return (
-            <TouchableOpacity
+            <Pressable
               key={t}
               style={[styles.typeChip, isSelected && styles.typeChipActive]}
               onPress={() => setSelectedType(t)}
@@ -45,7 +45,7 @@ export default function CoverageMapScreen() {
               <Text style={[styles.typeChipText, isSelected && styles.typeChipTextActive]}>
                 {t === 'ALL' ? 'Todas' : t}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           );
         })}
       </View>

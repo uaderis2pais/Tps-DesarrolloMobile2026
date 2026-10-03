@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
+  Pressable,
   ActivityIndicator,
   Platform,
 } from 'react-native';
@@ -35,12 +35,12 @@ export default function MonitorScreen() {
           <Text style={styles.appTitle}>Network QoS Monitor</Text>
           <Text style={styles.subtitle}>Telemetría y Calidad en Tiempo Real</Text>
         </View>
-        <TouchableOpacity
+        <Pressable
           style={styles.historyBtn}
           onPress={() => router.push('/history')}
         >
           <MaterialCommunityIcons name="history" size={20} color={colors.textSecondary} />
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {/* Banner de Estado de Segundo Plano */}
@@ -164,7 +164,7 @@ export default function MonitorScreen() {
       )}
 
       {/* 4. Botón de Acción Principal: Iniciar Prueba */}
-      <TouchableOpacity
+      <Pressable
         style={styles.startTestBtn}
         onPress={handleStartTest}
         disabled={store.isTesting}
@@ -177,7 +177,7 @@ export default function MonitorScreen() {
             <Text style={styles.startTestBtnText}>INICIAR TEST DE VELOCIDAD Y RTT</Text>
           </>
         )}
-      </TouchableOpacity>
+      </Pressable>
     </ScrollView>
   );
 }
@@ -394,11 +394,18 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: borderRadius.lg,
     gap: spacing.sm,
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
-    elevation: 6,
+    ...Platform.select({
+      web: {
+        boxShadow: '0px 4px 10px rgba(59, 130, 246, 0.4)',
+      },
+      default: {
+        shadowColor: colors.primary,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.4,
+        shadowRadius: 10,
+        elevation: 6,
+      },
+    }),
   },
   startTestBtnText: {
     color: colors.white,

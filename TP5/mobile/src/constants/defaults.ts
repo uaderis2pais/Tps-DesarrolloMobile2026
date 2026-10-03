@@ -3,24 +3,21 @@ import { AppConfig, HostProbeTarget, QoSThresholds } from '../types';
 export const DEFAULT_HOSTS: HostProbeTarget[] = [
   {
     id: 'cloudflare',
-    name: 'Cloudflare 1.1.1.1',
-    host: '1.1.1.1',
-    port: 80,
-    probeType: 'tcp',
+    name: 'Cloudflare 1.1.1.1 Edge',
+    host: 'https://cloudflare.com/cdn-cgi/trace',
+    probeType: 'http',
   },
   {
     id: 'google',
     name: 'Google DNS 8.8.8.8',
-    host: '8.8.8.8',
-    port: 53,
-    probeType: 'tcp',
+    host: 'https://dns.google/resolve?name=google.com',
+    probeType: 'http',
   },
   {
-    id: 'opendns',
-    name: 'Cisco OpenDNS',
-    host: '208.67.222.222',
-    port: 53,
-    probeType: 'tcp',
+    id: 'cloudflare-secondary',
+    name: 'Cloudflare 1.0.0.1 DNS',
+    host: 'https://1.0.0.1/cdn-cgi/trace',
+    probeType: 'http',
   },
   {
     id: 'reference-backend',

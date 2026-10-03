@@ -61,7 +61,7 @@ export const IrrigationModal: React.FC<IrrigationModalProps> = ({
     }
   };
 
-  const clientRequestIdPreview = 'req_' + valve.id.substring(0, 8) + '...';
+  const clientRequestIdPreview = 'UUID v4 (Idempotencia)';
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>

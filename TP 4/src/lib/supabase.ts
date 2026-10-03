@@ -40,10 +40,10 @@ const customStorage = {
 };
 
 const supabaseUrl =
-  process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://iwjkpmmwjvnthgiepzyt.supabase.co';
+  process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://yltezwfpnrwlzgxvdpqn.supabase.co';
 const supabaseAnonKey =
   process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ||
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3amtwbW13anZudGhnaWVwenl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxODU3ODgsImV4cCI6MjEwMzc2MTc4OH0.eTm1am_ozxcx6tf9KnQ-ulxbfkoayroE60bKIZbdYAw';
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlsdGV6d2ZwbnJ3bHpneHZkcHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxNzQ2OTYsImV4cCI6MjEwNTc1MDY5Nn0.evEkI-5Vw4qli9XgCcDXr8TT7nxsDZ02ph1YKj6lIIo';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {

@@ -162,11 +162,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setSession(null);
-    setUser(null);
-    setMemberships([]);
-    setActiveOrgId(null);
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.warn('[AuthContext] Error cerrando sesión en Supabase:', err);
+    } finally {
+      setSession(null);
+      setUser(null);
+      setMemberships([]);
+      setActiveOrgId(null);
+    }
   };
 
   return (

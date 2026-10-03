@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
+  Pressable,
 } from 'react-native';
 import { useQoSStore } from '../../src/store/useQoSStore';
 import { colors, spacing, borderRadius } from '../../src/constants/theme';
@@ -44,7 +44,7 @@ export default function HistoryAnalyticsScreen() {
 
         {/* Barra de Acciones: Filtros y Exportación */}
         <View style={styles.actionsBar}>
-          <TouchableOpacity
+          <Pressable
             style={[styles.actionBtn, hasActiveFilters && styles.actionBtnActive]}
             onPress={() => setFilterModalVisible(true)}
           >
@@ -56,20 +56,20 @@ export default function HistoryAnalyticsScreen() {
             <Text style={[styles.actionBtnText, hasActiveFilters && styles.actionBtnTextActive]}>
               {hasActiveFilters ? 'Filtros Activos' : 'Filtrar'}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity
+          <Pressable
             style={[styles.actionBtn, styles.exportBtn]}
             onPress={() => setExportModalVisible(true)}
           >
             <MaterialCommunityIcons name="cloud-download-outline" size={18} color={colors.white} />
             <Text style={styles.exportBtnText}>Exportar CSV/JSON</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         {/* Pestañas internas: Gráficos vs Lista */}
         <View style={styles.tabsRow}>
-          <TouchableOpacity
+          <Pressable
             style={[styles.tab, selectedTab === 'charts' && styles.tabActive]}
             onPress={() => setSelectedTab('charts')}
           >
@@ -81,9 +81,9 @@ export default function HistoryAnalyticsScreen() {
             <Text style={[styles.tabText, selectedTab === 'charts' && styles.tabTextActive]}>
               Series Temporales (RF-06)
             </Text>
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity
+          <Pressable
             style={[styles.tab, selectedTab === 'list' && styles.tabActive]}
             onPress={() => setSelectedTab('list')}
           >
@@ -95,7 +95,7 @@ export default function HistoryAnalyticsScreen() {
             <Text style={[styles.tabText, selectedTab === 'list' && styles.tabTextActive]}>
               Lista de Sesiones ({sessions.length})
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         {selectedTab === 'charts' ? (
@@ -147,12 +147,12 @@ export default function HistoryAnalyticsScreen() {
                             {item.overallQoSRating}
                           </Text>
                         </View>
-                        <TouchableOpacity
+                        <Pressable
                           onPress={() => store.deleteSession(item.id)}
                           style={styles.deleteBtn}
                         >
                           <MaterialCommunityIcons name="trash-can-outline" size={16} color={colors.textMuted} />
-                        </TouchableOpacity>
+                        </Pressable>
                       </View>
                     </View>
 

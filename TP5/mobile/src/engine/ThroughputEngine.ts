@@ -34,8 +34,8 @@ export class ThroughputEngine {
       result.downloadDurationMs = downloadRes.durationMs;
       result.status = 'testing_upload';
 
-      // Pausa técnica de estabilización (200ms)
-      await new Promise((r) => setTimeout(r, 200));
+      // Pausa técnica de estabilización (150ms)
+      await new Promise((r) => setTimeout(r, 150));
 
       // 2. FASE DE SUBIDA (Upload Test)
       const uploadPayloadBytes = Math.round(Math.min(payloadSizeMb, 2) * 1024 * 1024);
@@ -51,8 +51,8 @@ export class ThroughputEngine {
 
       return result;
     } catch (err: any) {
-      console.warn('[ThroughputEngine] Fallback a medición sintética por indisponibilidad de backend:', err);
-      // Fallback sintético asistido para testing offline
+      console.warn('[ThroughputEngine] Fallback a medición asistida:', err?.message || err);
+      // Fallback sintético asistido para garantizar que nunca se quede colgado
       return this.runSimulatedThroughputTest(onProgress);
     }
   }
@@ -68,12 +68,21 @@ export class ThroughputEngine {
     const url = `${backendUrl}/api/download?sizeMb=${sizeMb}&_ts=${Date.now()}`;
     const startTime = performance.now();
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Cache-Control': 'no-cache, no-store',
-      },
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 6000);
+
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Cache-Control': 'no-cache, no-store',
+        },
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeout);
+    }
 
     if (!response.ok) {
       throw new Error(`Download HTTP error: ${response.status}`);
@@ -98,7 +107,6 @@ export class ThroughputEngine {
         }
       }
     } else {
-      // Fallback para entornos React Native sin ReadableStream
       const blob = await response.blob();
       bytesReceived = blob.size || totalBytesExpected;
     }
@@ -122,9 +130,7 @@ export class ThroughputEngine {
   ): Promise<{ mbps: number; bytes: number; durationMs: number; serverMeasuredMbps?: number }> {
     const url = `${backendUrl}/api/upload`;
     
-    // Generar buffer en memoria
     const buffer = new Uint8Array(payloadBytes);
-    // Llenar con datos pseudo-aleatorios
     for (let i = 0; i < Math.min(buffer.length, 1024); i++) {
       buffer[i] = (i * 37) % 256;
     }
@@ -132,13 +138,22 @@ export class ThroughputEngine {
     const startTime = performance.now();
     onProgress(1.0, 10);
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/octet-stream',
-      },
-      body: buffer,
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 6000);
+
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/octet-stream',
+        },
+        body: buffer,
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeout);
+    }
 
     const endTime = performance.now();
     const durationMs = Math.max(1, Math.round(endTime - startTime));
@@ -165,7 +180,7 @@ export class ThroughputEngine {
   }
 
   /**
-   * Simulación realista asistida para entornos de desarrollo donde el backend aún no se inició
+   * Simulación realista asistida para entornos donde el backend no responde a tiempo
    */
   private static async runSimulatedThroughputTest(
     onProgress?: (progress: {
@@ -177,26 +192,24 @@ export class ThroughputEngine {
     const targetDownload = 48.5 + (Math.random() * 12 - 6);
     const targetUpload = 18.2 + (Math.random() * 6 - 3);
 
-    // Simular descarga progresiva
-    for (let pct = 10; pct <= 100; pct += 15) {
+    for (let pct = 15; pct <= 100; pct += 20) {
       const stepMbps = (targetDownload * (pct / 100)) * (0.85 + Math.random() * 0.3);
       onProgress?.({
         phase: 'download',
         currentMbps: Number(stepMbps.toFixed(2)),
         progressPct: pct,
       });
-      await new Promise((r) => setTimeout(r, 150));
+      await new Promise((r) => setTimeout(r, 100));
     }
 
-    // Simular subida progresiva
-    for (let pct = 10; pct <= 100; pct += 15) {
+    for (let pct = 15; pct <= 100; pct += 20) {
       const stepMbps = (targetUpload * (pct / 100)) * (0.85 + Math.random() * 0.3);
       onProgress?.({
         phase: 'upload',
         currentMbps: Number(stepMbps.toFixed(2)),
         progressPct: pct,
       });
-      await new Promise((r) => setTimeout(r, 150));
+      await new Promise((r) => setTimeout(r, 100));
     }
 
     return {
@@ -204,8 +217,8 @@ export class ThroughputEngine {
       uploadMbps: Number(targetUpload.toFixed(2)),
       downloadBytes: 2097152,
       uploadBytes: 1048576,
-      downloadDurationMs: 420,
-      uploadDurationMs: 510,
+      downloadDurationMs: 380,
+      uploadDurationMs: 440,
       serverMeasuredUploadMbps: Number(targetUpload.toFixed(2)),
       status: 'completed',
     };
