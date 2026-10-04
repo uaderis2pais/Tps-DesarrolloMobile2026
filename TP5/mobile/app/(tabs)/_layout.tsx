@@ -10,11 +10,19 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#111827',
-          borderTopColor: '#1F2937',
+          backgroundColor: colors.surface,
+          borderTopColor: colors.border,
           height: Platform.OS === 'ios' ? 88 : 64,
           paddingBottom: Platform.OS === 'ios' ? 28 : 10,
           paddingTop: 8,
+          ...Platform.select({
+            web: {
+              boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.04)',
+            },
+            default: {
+              elevation: 4,
+            },
+          }),
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textMuted,

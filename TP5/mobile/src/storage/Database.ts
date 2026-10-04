@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FilterCriteria, MeasurementSession } from '../types';
 import { SAMPLE_SESSIONS } from './sampleData';
 
-const STORAGE_KEY = '@network_qos_sessions_v1';
+const STORAGE_KEY = '@network_qos_sessions_v5_concepcion_verified';
 
 export class Database {
   private static cachedSessions: MeasurementSession[] | null = null;
@@ -23,6 +23,15 @@ export class Database {
       console.warn('[Database] Error inicializando almacenamiento local:', err);
       this.cachedSessions = [...SAMPLE_SESSIONS];
     }
+  }
+
+  /**
+   * Restablece la base de datos a las sesiones georreferenciadas originales
+   */
+  static async resetToDefaults(): Promise<MeasurementSession[]> {
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(SAMPLE_SESSIONS));
+    this.cachedSessions = [...SAMPLE_SESSIONS];
+    return [...SAMPLE_SESSIONS];
   }
 
   /**

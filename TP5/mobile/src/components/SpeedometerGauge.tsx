@@ -92,7 +92,9 @@ export const SpeedometerGauge: React.FC<Props> = ({
             cx={needleCoord.x}
             cy={needleCoord.y}
             r={6}
-            fill={colors.white}
+            fill={colors.primary}
+            stroke={colors.white}
+            strokeWidth={2}
           />
         )}
       </Svg>

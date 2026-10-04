@@ -14,7 +14,7 @@ import { colors, spacing, borderRadius } from '../constants/theme';
 import { QoSScorer } from '../engine/QoSScorer';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-export type MapTileStyle = 'osm' | 'dark' | 'satellite' | 'vector';
+export type MapTileStyle = 'osm' | 'satellite' | 'vector';
 
 interface Props {
   sessions: MeasurementSession[];
@@ -25,8 +25,8 @@ interface Props {
 
 export const CoverageHeatmap: React.FC<Props> = ({
   sessions,
-  currentLatitude = -32.4845,
-  currentLongitude = -58.2328,
+  currentLatitude = -32.48761,
+  currentLongitude = -58.22996,
   height = 420,
 }) => {
   const screenWidth = Dimensions.get('window').width;
@@ -78,17 +78,17 @@ export const CoverageHeatmap: React.FC<Props> = ({
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body, #map { width: 100%; height: 100%; background: #0f172a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    html, body, #map { width: 100%; height: 100%; background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     .custom-popup .leaflet-popup-content-wrapper {
-      background: #1e293b;
-      color: #f8fafc;
+      background: #ffffff;
+      color: #0f172a;
       border-radius: 12px;
-      border: 1px solid #334155;
+      border: 1px solid #e2e8f0;
       padding: 0;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
     }
     .custom-popup .leaflet-popup-tip {
-      background: #1e293b;
+      background: #ffffff;
     }
     .custom-popup .leaflet-popup-content {
       margin: 12px 14px;
@@ -106,22 +106,23 @@ export const CoverageHeatmap: React.FC<Props> = ({
     .popup-title {
       font-size: 13px;
       font-weight: 800;
-      color: #f1f5f9;
+      color: #0f172a;
       margin-bottom: 2px;
     }
     .popup-sub {
       font-size: 11px;
-      color: #94a3b8;
+      color: #64748b;
       margin-bottom: 8px;
     }
     .popup-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 6px;
-      background: #0f172a;
+      background: #f8fafc;
       padding: 8px;
       border-radius: 8px;
       margin-bottom: 8px;
+      border: 1px solid #e2e8f0;
     }
     .popup-stat-lbl {
       font-size: 9px;
@@ -132,21 +133,21 @@ export const CoverageHeatmap: React.FC<Props> = ({
     .popup-stat-val {
       font-size: 12px;
       font-weight: 800;
-      color: #38bdf8;
+      color: #0284c7;
     }
     .user-pulse {
       width: 18px;
       height: 18px;
-      background: #06b6d4;
+      background: #0284c7;
       border-radius: 50%;
       border: 3px solid #ffffff;
-      box-shadow: 0 0 12px #06b6d4;
+      box-shadow: 0 0 10px rgba(2, 132, 199, 0.7);
       animation: userPulse 2s infinite;
     }
     @keyframes userPulse {
-      0% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.7); }
-      70% { box-shadow: 0 0 0 15px rgba(6, 182, 212, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0); }
+      0% { box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.7); }
+      70% { box-shadow: 0 0 0 15px rgba(2, 132, 199, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(2, 132, 199, 0); }
     }
   </style>
 </head>
@@ -160,21 +161,19 @@ export const CoverageHeatmap: React.FC<Props> = ({
     const tileMode = '${mapTileStyle}';
     const showHeat = ${showHeatmap};
 
-    // Centro inicial: Concepción del Uruguay (-32.4845, -58.2328) o primera sesión
-    const centerLat = sessions.length > 0 ? sessions[0].lat : userLat;
-    const centerLng = sessions.length > 0 ? sessions[0].lng : userLng;
+    // Centro inicial: Calle Artigas 233 / Plaza Ramirez, Concepcion del Uruguay
+    const centerLat = userLat;
+    const centerLng = userLng;
 
     const map = L.map('map', {
       zoomControl: true,
       attributionControl: false
-    }).setView([centerLat, centerLng], 14);
+    }).setView([centerLat, centerLng], 15);
 
-    // Selección de capa cartográfica real
+    // Seleccion de capa cartografica
     let tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
     let subdomains = 'abc';
-    if (tileMode === 'dark') {
-      tileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
-    } else if (tileMode === 'satellite') {
+    if (tileMode === 'satellite') {
       tileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
       subdomains = 'abcd';
     }
@@ -242,7 +241,7 @@ export const CoverageHeatmap: React.FC<Props> = ({
       });
     });
 
-    // 3. Marcador de Posición Actual del Usuario
+    // 3. Marcador de Posición Actual del Usuario (Calle Artigas 233)
     bounds.push([userLat, userLng]);
     const userIcon = L.divIcon({
       className: 'user-icon-container',
@@ -253,12 +252,14 @@ export const CoverageHeatmap: React.FC<Props> = ({
     const userMarker = L.marker([userLat, userLng], { icon: userIcon }).addTo(map);
     userMarker.bindPopup(\`
       <div style="padding: 4px;">
-        <div style="font-weight: 800; font-size: 13px; color: #38bdf8;">📍 Tu Posición Actual</div>
-        <div style="font-size: 11px; color: #94a3b8;">\${userLat.toFixed(5)}, \${userLng.toFixed(5)}</div>
+        <div style="font-weight: 800; font-size: 13px; color: #0284c7;">📍 Tu Posición Actual</div>
+        <div style="font-size: 12px; color: #0f172a; font-weight: 700; margin-top: 2px;">Calle Artigas 233</div>
+        <div style="font-size: 11px; color: #64748b;">Concepción del Uruguay</div>
+        <div style="font-size: 10px; color: #94a3b8; margin-top: 3px;">\${userLat.toFixed(5)}, \${userLng.toFixed(5)}</div>
       </div>
     \`, { className: 'custom-popup' });
 
-    // Ajustar vista geográfica a todas las mediciones de la ciudad
+    // Ajustar vista geográfica a todas las mediciones de Concepción del Uruguay
     if (bounds.length > 1) {
       map.fitBounds(bounds, { padding: [35, 35], maxZoom: 16 });
     }
@@ -336,20 +337,6 @@ export const CoverageHeatmap: React.FC<Props> = ({
         </Pressable>
 
         <Pressable
-          style={[styles.tileBtn, mapTileStyle === 'dark' && styles.tileBtnActive]}
-          onPress={() => setMapTileStyle('dark')}
-        >
-          <MaterialCommunityIcons
-            name="weather-night"
-            size={14}
-            color={mapTileStyle === 'dark' ? colors.white : colors.textSecondary}
-          />
-          <Text style={[styles.tileBtnText, mapTileStyle === 'dark' && styles.tileBtnTextActive]}>
-            Oscuro
-          </Text>
-        </Pressable>
-
-        <Pressable
           style={[styles.tileBtn, mapTileStyle === 'satellite' && styles.tileBtnActive]}
           onPress={() => setMapTileStyle('satellite')}
         >
@@ -417,8 +404,8 @@ export const CoverageHeatmap: React.FC<Props> = ({
               </RadialGradient>
             </Defs>
 
-            {/* Fondo estilo mapa oscuro satelital */}
-            <Rect width={mapWidth} height={height} fill="#0d1424" rx={16} />
+            {/* Fondo estilo mapa claro */}
+            <Rect width={mapWidth} height={height} fill={colors.surfaceLight} rx={16} />
 
             {/* Retícula de cuadrícula geográfica */}
             {[0.25, 0.5, 0.75].map((factor) => (
@@ -428,16 +415,16 @@ export const CoverageHeatmap: React.FC<Props> = ({
                   y={height * factor}
                   width={mapWidth}
                   height={1}
-                  fill={colors.surfaceHighlight}
-                  opacity={0.3}
+                  fill={colors.border}
+                  opacity={0.6}
                 />
                 <Rect
                   x={mapWidth * factor}
                   y={0}
                   width={1}
                   height={height}
-                  fill={colors.surfaceHighlight}
-                  opacity={0.3}
+                  fill={colors.border}
+                  opacity={0.6}
                 />
               </React.Fragment>
             ))}
@@ -766,12 +753,24 @@ const styles = StyleSheet.create({
     right: 8,
     flexDirection: 'row',
     justifyContent: 'space-around',
-    backgroundColor: 'rgba(15, 23, 42, 0.85)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: colors.borderSubtle,
+    borderColor: colors.border,
+    ...Platform.select({
+      web: {
+        boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
+      },
+      default: {
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 4,
+        elevation: 2,
+      },
+    }),
   },
   legendItem: {
     flexDirection: 'row',
@@ -782,15 +781,17 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.1)',
   },
   legendLabel: {
     color: colors.textSecondary,
     fontSize: 10,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   modalBackdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: 'rgba(15, 23, 42, 0.45)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: spacing.lg,

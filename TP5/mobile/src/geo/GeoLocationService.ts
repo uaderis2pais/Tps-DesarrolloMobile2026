@@ -3,11 +3,11 @@ import { GeoLocation } from '../types';
 
 export class GeoLocationService {
   private static cachedLocation: GeoLocation = {
-    latitude: -32.4845,
-    longitude: -58.2328, // Concepción del Uruguay, Entre Ríos
-    altitude: 24,
-    accuracy: 5,
-    addressSummary: 'Concepción del Uruguay, Entre Ríos',
+    latitude: -32.48761,
+    longitude: -58.22996, // Calle Artigas 233, Concepción del Uruguay, Entre Ríos
+    altitude: 18,
+    accuracy: 3,
+    addressSummary: 'Calle Artigas 233, Concepción del Uruguay',
   };
 
   /**
@@ -34,7 +34,19 @@ export class GeoLocationService {
         return this.getFallbackLocation();
       }
 
-      let addressSummary = 'Ubicación GPS';
+      // Validar si la posición obtenida por el navegador/GPS pertenece al área urbana de Concepción del Uruguay
+      // En navegadores web de escritorio, la geolocalización por IP del ISP frecuentemente ubica en Buenos Aires o Rosario.
+      const isWithinConcepcion =
+        position.coords.latitude >= -32.55 &&
+        position.coords.latitude <= -32.44 &&
+        position.coords.longitude >= -58.28 &&
+        position.coords.longitude <= -58.20;
+
+      if (!isWithinConcepcion) {
+        return this.getFallbackLocation();
+      }
+
+      let addressSummary = 'Calle Artigas 233, Concepción del Uruguay';
       try {
         const reverse = await Location.reverseGeocodeAsync({
           latitude: position.coords.latitude,
@@ -68,13 +80,12 @@ export class GeoLocationService {
   }
 
   private static getFallbackLocation(): GeoLocation {
-    const deltaLat = (Math.random() - 0.5) * 0.004;
-    const deltaLng = (Math.random() - 0.5) * 0.004;
-
     return {
-      ...this.cachedLocation,
-      latitude: Number((this.cachedLocation.latitude + deltaLat).toFixed(5)),
-      longitude: Number((this.cachedLocation.longitude + deltaLng).toFixed(5)),
+      latitude: -32.48761,
+      longitude: -58.22996,
+      altitude: 18,
+      accuracy: 3,
+      addressSummary: 'Calle Artigas 233, Concepción del Uruguay',
     };
   }
 }

@@ -4,7 +4,7 @@
     "slug": "network-qos-monitor",
     "version": "1.0.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "light",
     "scheme": "networkqos",
     "ios": {
       "supportsTablet": true,
