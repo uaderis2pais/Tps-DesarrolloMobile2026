@@ -17,7 +17,7 @@ export default function TabLayout() {
           paddingTop: 8,
           ...Platform.select({
             web: {
-              boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.04)',
+              boxShadow: '0 -4px 16px rgba(0, 0, 0, 0.4)',
             },
             default: {
               elevation: 4,
