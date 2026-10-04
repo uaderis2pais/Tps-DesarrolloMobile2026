@@ -1,4 +1,5 @@
 import { ThroughputResult } from '../types';
+import { resolveNetworkUrl } from '../utils/networkUtils';
 
 export class ThroughputEngine {
   /**
@@ -23,9 +24,11 @@ export class ThroughputEngine {
       status: 'testing_download',
     };
 
+    const resolvedUrl = resolveNetworkUrl(backendUrl);
+
     try {
       // 1. FASE DE DESCARGA (Download Test)
-      const downloadRes = await this.measureDownload(backendUrl, payloadSizeMb, (mbps, pct) => {
+      const downloadRes = await this.measureDownload(resolvedUrl, payloadSizeMb, (mbps, pct) => {
         onProgress?.({ phase: 'download', currentMbps: mbps, progressPct: pct });
       });
 
@@ -39,7 +42,7 @@ export class ThroughputEngine {
 
       // 2. FASE DE SUBIDA (Upload Test)
       const uploadPayloadBytes = Math.round(Math.min(payloadSizeMb, 2) * 1024 * 1024);
-      const uploadRes = await this.measureUpload(backendUrl, uploadPayloadBytes, (mbps, pct) => {
+      const uploadRes = await this.measureUpload(resolvedUrl, uploadPayloadBytes, (mbps, pct) => {
         onProgress?.({ phase: 'upload', currentMbps: mbps, progressPct: pct });
       });
 
@@ -51,8 +54,18 @@ export class ThroughputEngine {
 
       return result;
     } catch (err: any) {
-      console.warn('[ThroughputEngine] Fallback a medición asistida:', err?.message || err);
-      // Fallback sintético asistido para garantizar que nunca se quede colgado
+      console.warn(`[ThroughputEngine] Fallo de conexión contra ${resolvedUrl}:`, err?.message || err);
+
+      // Si falló el backend local (ej. java.net.ConnectException en móvil/4G),
+      // reintentamos automáticamente contra Cloudflare (Internet real) para medir velocidad real
+      if (!resolvedUrl.includes('cloudflare.com')) {
+        try {
+          console.log('[ThroughputEngine] Reintentando medición con servidor público Cloudflare...');
+          return await this.runFullThroughputTest('https://speed.cloudflare.com', payloadSizeMb, onProgress);
+        } catch (_) {}
+      }
+
+      // Fallback sintético asistido como última instancia de resguardo
       return this.runSimulatedThroughputTest(onProgress);
     }
   }
@@ -66,7 +79,7 @@ export class ThroughputEngine {
     onProgress: (mbps: number, pct: number) => void
   ): Promise<{ mbps: number; bytes: number; durationMs: number }> {
     const isCloudflare = backendUrl.includes('cloudflare.com');
-    const isLocalhost = backendUrl.includes('localhost') || backendUrl.includes('127.0.0.1');
+    const isLocalhost = backendUrl.includes('localhost') || backendUrl.includes('127.0.0.1') || backendUrl.includes('10.0.2.2') || backendUrl.includes(':3001');
 
     const totalBytesExpected = Math.round(sizeMb * 1024 * 1024);
     const url = isCloudflare
@@ -144,7 +157,7 @@ export class ThroughputEngine {
     onProgress: (mbps: number, pct: number) => void
   ): Promise<{ mbps: number; bytes: number; durationMs: number; serverMeasuredMbps?: number }> {
     const isCloudflare = backendUrl.includes('cloudflare.com');
-    const isLocalhost = backendUrl.includes('localhost') || backendUrl.includes('127.0.0.1');
+    const isLocalhost = backendUrl.includes('localhost') || backendUrl.includes('127.0.0.1') || backendUrl.includes('10.0.2.2') || backendUrl.includes(':3001');
 
     const url = isCloudflare
       ? 'https://speed.cloudflare.com/__up'

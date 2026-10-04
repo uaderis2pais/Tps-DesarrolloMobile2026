@@ -197,8 +197,8 @@ app.get('/api/telemetry', (_req: Request, res: Response) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`[QoS Backend] Servidor escuchando en http://localhost:${PORT}`);
+app.listen(Number(PORT), '0.0.0.0', () => {
+  console.log(`[QoS Backend] Servidor escuchando en http://0.0.0.0:${PORT} (accesible en red local)`);
   console.log(`[QoS Backend] Endpoints listos:`);
   console.log(`   - GET  /health`);
   console.log(`   - GET  /api/ping`);

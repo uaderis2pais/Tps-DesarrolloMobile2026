@@ -1,4 +1,5 @@
 import { HostProbeTarget, PingResult } from '../types';
+import { resolveNetworkUrl } from '../utils/networkUtils';
 
 export class PingEngine {
   /**
@@ -161,7 +162,8 @@ export class PingEngine {
   }
 
   private static resolveProbeUrl(target: HostProbeTarget): string {
-    const sep = target.host.includes('?') ? '&' : '?';
-    return `${target.host}${sep}_ts=${Date.now()}`;
+    const rawHost = resolveNetworkUrl(target.host);
+    const sep = rawHost.includes('?') ? '&' : '?';
+    return `${rawHost}${sep}_ts=${Date.now()}`;
   }
 }

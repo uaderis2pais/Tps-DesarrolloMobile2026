@@ -12,6 +12,7 @@ import { colors, spacing, borderRadius } from '../../src/constants/theme';
 import { SpeedometerGauge } from '../../src/components/SpeedometerGauge';
 import { HostPingCard } from '../../src/components/HostPingCard';
 import { QoSScorer } from '../../src/engine/QoSScorer';
+import { resolveNetworkUrl } from '../../src/utils/networkUtils';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function SpeedTestScreen() {
@@ -111,7 +112,7 @@ export default function SpeedTestScreen() {
         <Text style={styles.serverHelpText}>
           {store.config.backendUrl.includes('cloudflare.com')
             ? '🌐 Midiendo velocidad real de tu enlace a Internet (WiFi / Datos Móviles).'
-            : '💻 Midiendo contra backend Node.js en localhost:3001 (calibrado a canal celular).'}
+            : `💻 Midiendo contra backend Node.js en ${resolveNetworkUrl(store.config.backendUrl)} (calibrado a canal celular).`}
         </Text>
       </View>
 

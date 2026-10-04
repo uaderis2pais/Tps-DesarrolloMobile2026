@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useQoSStore } from '../../src/store/useQoSStore';
 import { colors, spacing, borderRadius } from '../../src/constants/theme';
+import { resolveNetworkUrl, getDevHostIp } from '../../src/utils/networkUtils';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function SettingsScreen() {
@@ -52,13 +53,14 @@ export default function SettingsScreen() {
   };
 
   const handleTestConnection = async () => {
+    const targetUrl = resolveNetworkUrl(backendUrl.trim());
     try {
-      const res = await fetch(`${backendUrl.trim()}/health`);
+      const res = await fetch(`${targetUrl}/health`);
       if (res.ok) {
         const json = await res.json();
         Alert.alert(
           'Servidor en línea',
-          `Conexión exitosa con ${json.service || 'backend QoS'}. Uptime: ${json.uptimeSeconds || 0}s`
+          `Conexión exitosa con ${json.service || 'backend QoS'} (${targetUrl}). Uptime: ${json.uptimeSeconds || 0}s`
         );
       } else {
         Alert.alert('Error HTTP', `El servidor respondió con código ${res.status}`);
@@ -66,7 +68,7 @@ export default function SettingsScreen() {
     } catch (e: any) {
       Alert.alert(
         'Fallo de conexión',
-        `No se pudo conectar a ${backendUrl}: ${e.message}\nVerifica que el backend esté corriendo (npm start en TP5/backend).`
+        `No se pudo conectar a ${targetUrl}: ${e.message}\nVerifica que la PC y el móvil estén en la misma red Wi-Fi o selecciona Cloudflare.`
       );
     }
   };
@@ -153,7 +155,7 @@ export default function SettingsScreen() {
             style={styles.textInput}
             value={backendUrl}
             onChangeText={setBackendUrl}
-            placeholder="http://localhost:3001"
+            placeholder={`http://${getDevHostIp()}:3001`}
             placeholderTextColor={colors.textMuted}
             autoCapitalize="none"
           />
