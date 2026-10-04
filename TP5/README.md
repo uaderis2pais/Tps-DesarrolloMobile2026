@@ -98,9 +98,16 @@ npm install
 
 # Opción A: Ejecutar en el Navegador Web (Desarrollo y Presentación Inmediata)
 npm run web
-# O bien: npx expo start --web
 
-# Opción B: Ejecutar en Dispositivo o Emulador Android (con módulos nativos)
+# Opción B: Ejecutar en Dispositivo Móvil vía Expo Go / Expo Dev Client
+npx expo start
+# Escanear el código QR con la cámara (iOS) o la app Expo Go (Android).
+
+# Opción C: Compilar y Generar APK Instalable Standalone (Android)
+npx eas build -p android --profile preview
+# Genera un archivo .apk descargable e instalable en cualquier dispositivo sin tiendas.
+
+# Opción D: Ejecutar en Emulador/Dispositivo Local con Módulos Nativos Kotlin
 npx expo run:android
 ```
 

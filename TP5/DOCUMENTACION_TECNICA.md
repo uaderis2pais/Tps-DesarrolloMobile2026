@@ -188,8 +188,23 @@ El componente `BackgroundSampler.ts` implementa un orquestador no bloqueante par
 
 El backend está desarrollado en **Node.js + Express + TypeScript** y cuenta con despliegue en un solo paso mediante `Dockerfile` y `docker-compose.yml`:
 - `GET /health`: Healthcheck y estado de servicio.
-- `GET /api/ping`: Sonda rápida de microsegundos.
-- `GET /api/download?sizeMb=N`: Generador de payload binario no comprimible.
-- `POST /api/upload`: Sumidero de bytes para medición de throughput ascendente.
+- `GET /api/ping`: Sonda rápida de microsegundos con timestamp en nanosegundos (`process.hrtime`).
+- `GET /api/download?sizeMb=N`: Generador de payload binario en RAM para saturar el canal sin costo de CPU.
+- `POST /api/upload`: Sumidero de bytes con cálculo de tasa del lado servidor (`serverMeasuredMbps`).
 - `GET /api/servers`: Catálogo de hosts de prueba recomendados.
-- `GET/POST /api/telemetry`: Ingesta remota opcional de reportes de calidad.
+- `GET/POST /api/telemetry`: Ingesta y agregación remota de reportes de calidad.
+
+Instrucciones completas de despliegue local, Docker y Cloud documentadas en [`TP5/backend/README.md`](file:///d:/Archivos%20Personales/Desktop/UNIVERSIDAD/Visual%20studio%20Code/Desarrollo%20app%20mobile/TP5/backend/README.md).
+
+---
+
+## 9. Entregables del Proyecto (Cumplimiento de Pautas de Cátedra)
+
+| Entregable | Estado | Ubicación / Instrucción de Acceso |
+| :--- | :---: | :--- |
+| **Código fuente completo en repositorio** | ✅ Completo | Directorio `TP5/` (Frontend `mobile/` y microservicio `backend/`). |
+| **Documento técnico detallado** | ✅ Completo | [`DOCUMENTACION_TECNICA.md`](file:///d:/Archivos%20Personales/Desktop/UNIVERSIDAD/Visual%20studio%20Code/Desarrollo%20app%20mobile/TP5/DOCUMENTACION_TECNICA.md) con fórmulas matemáticas, arquitectura y código Kotlin. |
+| **Guion de defensa oral (3 a 5 min)** | ✅ Completo | [`DEFENSA.md`](file:///d:/Archivos%20Personales/Desktop/UNIVERSIDAD/Visual%20studio%20Code/Desarrollo%20app%20mobile/TP5/DEFENSA.md) con estructura temporal, diapositivas y preguntas frecuentes. |
+| **Backend de referencia con despliegue** | ✅ Completo | En `TP5/backend/` con `Dockerfile`, `docker-compose.yml`, scripts `npm start` y guía [`backend/README.md`](file:///d:/Archivos%20Personales/Desktop/UNIVERSIDAD/Visual%20studio%20Code/Desarrollo%20app%20mobile/TP5/backend/README.md). |
+| **APK / Build accesible vía Expo Dev Client** | ✅ Configurado | 1) Acceso instantáneo vía **Expo Go / Expo Dev Client** escaneando el código QR generado con `npx expo start`.<br>2) Generación de **APK instalable standalone** mediante EAS Build (`npx eas build -p android --profile preview`) con configuración oficial [`eas.json`](file:///d:/Archivos%20Personales/Desktop/UNIVERSIDAD/Visual%20studio%20Code/Desarrollo%20app%20mobile/TP5/mobile/eas.json). |
+
