@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-native",
+    "strict": false,
+    "skipLibCheck": true
+  },
+  "exclude": [
+    "**/node_modules",
+    "**/dist",
+    "**/.expo",
+    "TP1",
+    "TP2",
+    "TP 3",
+    "TP 4",
+    "TP5"
+  ]
+}
