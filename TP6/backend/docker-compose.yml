@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  diagnostics-sync-backend:
+    build: .
+    container_name: network_diagnostics_sync_backend
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+    restart: unless-stopped

@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "Network Diagnostics Suite",
+    "slug": "network-diagnostics-suite",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "scheme": "networkdiagnostics",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.networkdiagnostics.suite",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Permitir acceso a la cámara para escanear números de serie/QR de equipos y capturar evidencia fotográfica de la instalación.",
+        "NSLocationWhenInUseUsageDescription": "Permitir georreferenciación de alta precisión para el reporte técnico de instalación.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Permitir georreferenciación de alta precisión para el reporte técnico de instalación."
+      }
+    },
+    "android": {
+      "package": "com.networkdiagnostics.suite",
+      "adaptiveIcon": {
+        "backgroundColor": "#0A0F1D"
+      },
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.ACCESS_WIFI_STATE",
+        "android.permission.CAMERA",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.CHANGE_WIFI_MULTICAST_STATE"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router"
+    ]
+  }
+}
