@@ -45,3 +45,6 @@ example
 # Editor / AI assistants
 .vscode/
 .claude/
+
+# Cloned independent workspaces
+tp6-desarrolloapps/
